@@ -1,10 +1,37 @@
+'use client';
+
 import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from './page.module.css'
+import { GetWatchlists } from './utils/Supabase'
+import { useEffect, useState } from 'react';
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
+  const [data, setData] = useState<any>(null);
+  const [fetchError, setFetchError] = useState<any>(null);
+
+  useEffect(() => { 
+
+    const getWatchlists = async() => {
+        const { data, error } = await GetWatchlists()
+        if (error) {
+            setFetchError(`Could not fetch watchlists: ${error.message}`)
+            setData(null);
+            console.log(error);
+        }
+        if (data) {
+            setData(data);
+            console.log(data);
+            setFetchError(null);
+        }
+    };
+    
+    getWatchlists();
+}, []);
+
+  
   return (
     <main className={styles.main}>
       <div className={styles.description}>
