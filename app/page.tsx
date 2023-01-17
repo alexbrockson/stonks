@@ -1,118 +1,84 @@
 'use client';
 
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from './page.module.css'
-import { GetWatchlists } from './utils/Supabase'
-import { useEffect, useState } from 'react';
 
-const inter = Inter({ subsets: ['latin'] })
+import { InsertWatchlist } from './utils/Supabase'
+import { useState } from 'react';
+import Alert from './components/alert';
+import Image from 'next/image';
 
 export default function Home() {
+
   const [data, setData] = useState<any>(null);
-  const [fetchError, setFetchError] = useState<any>(null);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('');
+  const [name, setName] = useState('');
+  const [symbol, setSymbol] = useState('');
+  const [showImage, setShowImage] = useState(false);
 
-  useEffect(() => { 
+  const create = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-    const getWatchlists = async() => {
-        const { data, error } = await GetWatchlists()
-        if (error) {
-            setFetchError(`Could not fetch watchlists: ${error.message}`)
-            setData(null);
-            console.log(error);
-        }
+    if (name.length && symbol.length) {
+      let payload = {
+        name: name,
+        stocks: symbol.toUpperCase().trim()
+      }
+
+      const { data, error } = await InsertWatchlist(payload);
+      if (error) {
+        console.log('error', error);
+        setAlertMessage(error.message);
+        setAlertType('error');
+      }
+      else {
         if (data) {
-            setData(data);
-            console.log(data);
-            setFetchError(null);
+          setData(data);
+          setAlertMessage('Watchlist created!');
+          setAlertType('success');
+          setShowImage(true);
+          // redirect to watchlist page after 2 seconds
+          setTimeout(() => {
+            window.location.href = `/watchlists/${data.name}`;
+          }, 2000);
         }
-    };
-    
-    getWatchlists();
-}, []);
+      }
+    }
+  }
 
-  
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    <>
+
+
+      <div className="center">
+
+        {
+          alertMessage &&
+          (
+            <Alert message={alertMessage} type={alertType} />
+          )
+        }
+        <form onSubmit={create}>
+          <div className="form-control w-full max-w-xs">
+            <label className="label" htmlFor="name">
+              <span className="label-text">Name your new watchlist</span>
+            </label>         
+            <input name="name" id="name" type="text" onChange={(e) => setName(e.target.value.replace(/[^a-zA-Z0-9]/g, '').toLowerCase())} value={name} className="input input-bordered w-full max-w-xs" />            
+          </div>
+          <div className="form-control w-full max-w-xs">
+            <label className="label" htmlFor="symbol">
+              <span className="label-text">Add a symbol or two to start with</span>
+            </label>
+            <input name="symbol" id="symbol" type="text" onChange={(e) => setSymbol(e.target.value.toUpperCase())} value={symbol} className="input input-bordered w-full max-w-xs" />
+          </div>
+          <br/>
+          <button className="btn btn-primary" type="submit">➕ Watchlist</button>
+        </form>
+        <br/>        
+        {showImage && (
+          <Image src="/stonks.jpg" alt="stonks" width="798" height="599" />
+        )
+        }
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-        <div className={styles.thirteen}>
-          <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </>
   )
 }

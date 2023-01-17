@@ -1,14 +1,9 @@
 import { createClient } from '@supabase/supabase-js'
-// import Watchlist from './Watchlist';
-
-// const supabase = createClient (
-//     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-//     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-// )
+import Watchlist from './Watchlist';
 
 const supabase = createClient (
-    "https://cinwpldnpialtzuyyczy.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpbndwbGRucGlhbHR6dXl5Y3p5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NzM3NDE5OTIsImV4cCI6MTk4OTMxNzk5Mn0.piWpgX-pv75cN9scz4idU0A36Yz8cRGqhpj3FfjdPYo"
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
 const GetWatchlists = async() =>  {    
@@ -19,7 +14,41 @@ const GetWatchlists = async() =>  {
     return { data, error }
 }
 
-export { GetWatchlists }
+const GetWatchlist = async(name:string) =>  {
+    console.log('getting name: ', name);
+    let { data, error } = await supabase
+        .from('watchlist')
+        .select()
+        .eq('name', name)
+        .single()
+        console.log('data', data );
+    return { data, error }
+}
+
+// create new watchlist
+async function InsertWatchlist( payload:Watchlist )  {
+    let symbol = payload.stocks?.trim();
+    const { data, error } = await supabase
+        .from('watchlist')
+        .insert({name:payload.name?.toLowerCase(), stocks:symbol})
+        .select()
+        .single()
+    return { data, error }
+}
+
+// update watchlist stocks
+async function UpdateWatchlistStocks( payload:Watchlist )  {
+    let symbol = payload.stocks?.trim();
+    const { data, error } = await supabase
+        .from('watchlist')
+        .update({ "stocks": symbol })
+        .eq('id', payload.id)
+        .select()
+        .single()
+    return { data, error }
+}
+
+export { GetWatchlists, GetWatchlist, InsertWatchlist, UpdateWatchlistStocks }
 
 // const GetLink = async( short_url: string ) => {    
 //     let { data, error } = await supabase

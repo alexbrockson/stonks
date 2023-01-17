@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import './globals.css'
 
 export default function RootLayout({
@@ -7,12 +8,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/*
-        <head /> will contain the components returned by the nearest parent
-        head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
-      */}
       <head />
-      <body>{children}</body>
+      <body className="center-site">
+        <div className="navbar bg-neutral">
+          <div className="flex-1">
+            <Link href={'./'} className="btn btn-ghost normal-case text-xl">Stonks</Link>
+          </div>
+          <div className="flex-none">
+            <ul className="menu menu-horizontal px-1">
+              <li><Link href={'/watchlists'}>Watchlists</Link></li>
+            </ul>
+          </div>
+        </div>
+        {children}
+      </body>
     </html>
   )
 }
