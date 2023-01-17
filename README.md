@@ -1,3 +1,6 @@
+## What is Stonks?
+Stonks is a fun little project I did over the weekend to further explore React. It is a simple application to create watchlists of stocks so that their up to date price information can be viewed in a convenient dashboard like interface. Up to date price information is pulled from [Finnhub.io](https://finnhub.io/).
+
 ## Getting Started
 
 ### 1. Install the required packages:
