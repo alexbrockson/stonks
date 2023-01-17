@@ -31,4 +31,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Demo
 
-Check out a [demo](https://stonks.vercel.app/)!
+Check out a ~~[demo]~~! (something isn't working with the demo right now)
